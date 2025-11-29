@@ -1,0 +1,12 @@
+{{ define "main" }}
+  <article>
+    <h1>{{ .Title }}</h1>
+    <p class="meta">{{ .Date.Format "Jan 2, 2006" }}</p>
+
+    {{ if .Params.description }}
+      <p class="description">{{ .Params.description }}</p>
+    {{ end }}
+
+    {{ .Content }}
+  </article>
+{{ end }}

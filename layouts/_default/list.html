@@ -1,0 +1,22 @@
+{{ define "main" }}
+  {{ if .IsHome }}
+    <h2>Latest explanations</h2>
+  {{ else }}
+    <h2>{{ .Title }}</h2>
+  {{ end }}
+
+  <ul class="post-list">
+    {{ range .Paginator.Pages }}
+      <li>
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="meta">{{ .Date.Format "Jan 2, 2006" }}</p>
+        <p>{{ with .Params.description }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>
+      </li>
+    {{ end }}
+  </ul>
+
+  <nav class="pagination">
+    {{ if .Paginator.HasPrev }}<a href="{{ .Paginator.Prev.URL }}">Newer</a>{{ end }}
+    {{ if .Paginator.HasNext }}<a href="{{ .Paginator.Next.URL }}">Older</a>{{ end }}
+  </nav>
+{{ end }}

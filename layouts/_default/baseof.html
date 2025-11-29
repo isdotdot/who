@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1><a href="{{ "/" | relURL }}">{{ .Site.Title }}</a></h1>
+      <p class="tagline">{{ .Site.Params.siteDescription }}</p>
+    </div>
+  </header>
+
+  <main class="container">
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© {{ now.Format "2006" }} isdotdot · Why Things Happen</p>
+    </div>
+  </footer>
+</body>
+</html>

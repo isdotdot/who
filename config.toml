@@ -1,0 +1,7 @@
+baseURL = "https://why.isdotdot.com/"
+languageCode = "en-us"
+title = "Why Things Happen"
+paginate = 10
+
+[params]
+  siteDescription = "Friendly, simple explanations for everyday 'why does...?' questions."
