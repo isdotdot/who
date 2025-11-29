@@ -12,22 +12,7 @@ CONTENT_DIR.mkdir(parents=True, exist_ok=True)
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
 
-SYSTEM_PROMPT = """
-You write short, friendly blog posts that answer everyday "why does ... ?" questions.
-Tone: neutral + friendly, clear, practical. Audience: normal people searching the web.
-"""
 
-USER_PROMPT = """
-Write ONE complete blog post that answers a common "why does ... ?" question people might Google.
-
-Output format:
-- Plain Markdown only.
-- First line MUST be a top-level heading starting with "# " and containing the title.
-- After that, write 700-900 words of content with headings and short paragraphs.
-- Do NOT include any front matter.
-- Do NOT include JSON.
-- Do NOT include backticks or ``` fences.
-"""
 
 def slugify(title: str) -> str:
     slug = title.lower()
@@ -132,3 +117,11 @@ draft = false
 if __name__ == "__main__":
     main()
 
+
+SYSTEM_PROMPT = """
+You write engaging but concise biographical posts that answer 'Who is ... ?' questions. Tone: neutral, respectful, informative.
+"""
+
+USER_PROMPT = """
+Write ONE complete blog post answering a 'Who is ... ?' question. Include intro, background, key achievements, and a summary. First line must be '# Title'. Write 700-900 words in Markdown. No front matter, no JSON, no backticks.
+"""
