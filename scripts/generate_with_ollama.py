@@ -12,7 +12,33 @@ CONTENT_DIR.mkdir(parents=True, exist_ok=True)
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
 
+TITLE_DEFAULT = "Who People Are"
+TAGS = ["who", "profile"]
+DESCRIPTION_FALLBACK = "A short profile explaining who someone is and why they are notable."
 
+SYSTEM_PROMPT = """
+You write engaging but concise biographical posts that answer 'Who is ... ?' questions.
+Tone: neutral, respectful, and informative.
+"""
+
+USER_PROMPT = """
+Write ONE complete blog post answering a 'Who is ... ?' question.
+
+The post should include:
+- A short intro explaining who the person is and why they are notable.
+- A brief background / early life section.
+- Key achievements or reasons they are known.
+- Any relevant context or impact.
+- A short closing summary.
+
+Output format:
+- Plain Markdown only.
+- First line MUST be a top-level heading starting with "# " and containing the person's name.
+- 700-900 words total, with headings and short paragraphs.
+- Do NOT include any front matter.
+- Do NOT include JSON.
+- Do NOT include backticks or ``` fences.
+"""
 
 def slugify(title: str) -> str:
     slug = title.lower()
@@ -35,10 +61,9 @@ def call_ollama() -> str:
 
 def extract_title_and_body(md: str):
     lines = md.splitlines()
-    title = "Why Things Happen"
+    title = TITLE_DEFAULT
     body_lines = []
 
-    # Find first non-empty line as heading/title
     first_nonempty = None
     for i, line in enumerate(lines):
         if line.strip():
@@ -50,24 +75,20 @@ def extract_title_and_body(md: str):
 
     first_line = lines[first_nonempty].strip()
 
-    # Handle "# Title" or "## Title" or bold "**Title**"
     if first_line.startswith("#"):
-        # strip leading #'s and spaces
         title = first_line.lstrip("#").strip(" *")
         body_lines = lines[first_nonempty + 1 :]
     elif first_line.startswith("**") and first_line.endswith("**"):
         title = first_line.strip("* ").strip()
         body_lines = lines[first_nonempty + 1 :]
     else:
-        # fallback: treat first line as title anyway
         title = first_line
         body_lines = lines[first_nonempty + 1 :]
 
     body = "\n".join(body_lines).strip()
-    return title or "Why Things Happen", body
+    return title or TITLE_DEFAULT, body
 
 def make_description(body: str) -> str:
-    # Find first non-empty, non-heading line and use first ~180 chars
     for line in body.splitlines():
         stripped = line.strip()
         if not stripped:
@@ -78,7 +99,7 @@ def make_description(body: str) -> str:
         if len(desc) > 180:
             desc = desc[:177] + "..."
         return desc
-    return "A simple explanation for an everyday question."
+    return DESCRIPTION_FALLBACK
 
 def main():
     raw = call_ollama()
@@ -89,7 +110,6 @@ def main():
 
     description = make_description(body)
 
-    tags = ["why", "everyday"]
     today = datetime.date.today().strftime("%Y-%m-%d")
     slug = slugify(title)
     filename = f"{today}-{slug}.md"
@@ -97,7 +117,7 @@ def main():
     if path.exists():
         path = CONTENT_DIR / f"{today}-{slug}-2.md"
 
-    tags_toml = ", ".join(f'"{t}"' for t in tags)
+    tags_toml = ", ".join(f'"{t}"' for t in TAGS)
 
     front_matter = f"""+++
 title = "{title.replace('"', "'")}"
@@ -116,12 +136,3 @@ draft = false
 
 if __name__ == "__main__":
     main()
-
-
-SYSTEM_PROMPT = """
-You write engaging but concise biographical posts that answer 'Who is ... ?' questions. Tone: neutral, respectful, informative.
-"""
-
-USER_PROMPT = """
-Write ONE complete blog post answering a 'Who is ... ?' question. Include intro, background, key achievements, and a summary. First line must be '# Title'. Write 700-900 words in Markdown. No front matter, no JSON, no backticks.
-"""
