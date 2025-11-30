@@ -7,26 +7,17 @@
 
   {{ .Content }}
 
-  {{/* Related Posts */}}
-  {{ $current := . }}
-  {{ $related := slice }}
-  {{ with .Params.tags }}
-    {{ range . }}
-      {{ $t := . }}
-      {{ $tagPages := where $current.Site.RegularPages "Params.tags" "intersect" (slice $t) }}
-      {{ $related = $related | append $tagPages }}
-    {{ end }}
-  {{ end }}
-  {{ $related = $related | uniq | where "Permalink" "ne" .Permalink | first 4 }}
+  {{/* Related Posts using Hugo's related content API */}}
+  {{ $related := .Site.RegularPages.Related . | first 4 }}
 
   {{ if gt (len $related) 0 }}
-  <hr>
-  <h2>Related explanations</h2>
-  <ul>
-    {{ range $related }}
-      <li><a href="{{ .Permalink }}">{{ .Title }}</a></li>
-    {{ end }}
-  </ul>
+    <hr>
+    <h2>Related explanations</h2>
+    <ul>
+      {{ range $related }}
+        <li><a href="{{ .Permalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
   {{ end }}
 </article>
 {{ end }}
