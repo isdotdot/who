@@ -19,6 +19,8 @@ DESCRIPTION_FALLBACK = "A short profile explaining who someone is and why they a
 SYSTEM_PROMPT = """
 You write engaging but concise biographical posts that answer 'Who is ... ?' questions.
 Tone: neutral, respectful, and informative.
+
+Never repeat people that have already been covered on this site.
 """
 
 USER_PROMPT = """
@@ -30,6 +32,8 @@ The post should include:
 - Key achievements or reasons they are known.
 - Any relevant context or impact.
 - A short closing summary.
+
+Choose a person who is reasonably well-known and has not been covered before on this site.
 
 Output format:
 - Plain Markdown only.
@@ -46,9 +50,26 @@ def slugify(title: str) -> str:
     slug = slug.strip("-")
     return slug or "post"
 
+def get_existing_topics_snippet() -> str:
+    titles = []
+    for p in CONTENT_DIR.glob("*.md"):
+        try:
+            text = p.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        m = re.search(r'^title\s*=\s*"([^"]+)"', text, re.MULTILINE)
+        if m:
+            titles.append(m.group(1))
+    titles = sorted(set(titles))
+    if not titles:
+        return ""
+    joined = "; ".join(titles[:50])
+    return f"\nPeople already covered on this site (do NOT repeat these): {joined}\n"
+
 def call_ollama() -> str:
     url = f"{OLLAMA_URL}/api/generate"
-    prompt = SYSTEM_PROMPT.strip() + "\n\n" + USER_PROMPT.strip()
+    history = get_existing_topics_snippet()
+    prompt = SYSTEM_PROMPT.strip() + history + "\n\n" + USER_PROMPT.strip()
 
     resp = requests.post(
         url,
@@ -112,6 +133,13 @@ def main():
 
     today = datetime.date.today().strftime("%Y-%m-%d")
     slug = slugify(title)
+
+    # Hard dedupe
+    existing_slugs = {p.stem.split("-", 3)[-1] for p in CONTENT_DIR.glob("*.md")}
+    if slug in existing_slugs:
+        print(f"Duplicate person detected for slug '{slug}', skipping.")
+        return
+
     filename = f"{today}-{slug}.md"
     path = CONTENT_DIR / filename
     if path.exists():
