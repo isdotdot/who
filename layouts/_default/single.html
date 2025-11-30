@@ -1,12 +1,32 @@
 {{ define "main" }}
-  <article>
-    <h1>{{ .Title }}</h1>
-    <p class="meta">{{ .Date.Format "Jan 2, 2006" }}</p>
+<article>
+  <h1>{{ .Title }}</h1>
+  <div class="post-meta">
+    {{ .Date.Format "Jan 2, 2006" }}
+  </div>
 
-    {{ if .Params.description }}
-      <p class="description">{{ .Params.description }}</p>
+  {{ .Content }}
+
+  {{/* Related Posts */}}
+  {{ $current := . }}
+  {{ $related := slice }}
+  {{ with .Params.tags }}
+    {{ range . }}
+      {{ $t := . }}
+      {{ $tagPages := where $current.Site.RegularPages "Params.tags" "intersect" (slice $t) }}
+      {{ $related = $related | append $tagPages }}
     {{ end }}
+  {{ end }}
+  {{ $related = $related | uniq | where "Permalink" "ne" .Permalink | first 4 }}
 
-    {{ .Content }}
-  </article>
+  {{ if gt (len $related) 0 }}
+  <hr>
+  <h2>Related explanations</h2>
+  <ul>
+    {{ range $related }}
+      <li><a href="{{ .Permalink }}">{{ .Title }}</a></li>
+    {{ end }}
+  </ul>
+  {{ end }}
+</article>
 {{ end }}

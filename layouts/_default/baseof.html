@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  {{ partial "head.html" . }}
+  <meta charset="utf-8">
+  <title>{{ block "title" . }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ partial "seo.html" . }}
+  <link rel="alternate" type="application/rss+xml" href="{{ .Site.BaseURL }}index.xml">
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background:#f8fafc; color:#0f172a; }
+    header { background:#0f172a; color:#f9fafb; padding:1.5rem; }
+    main { max-width: 800px; margin: 0 auto; background:#fff; padding:2rem; }
+    a { color:#2563eb; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    footer { text-align:center; font-size:0.875rem; color:#6b7280; padding:2rem; }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <h1><a href="{{ "/" | relURL }}">{{ .Site.Title }}</a></h1>
-      <p class="tagline">{{ .Site.Params.siteDescription }}</p>
-    </div>
-  </header>
-
-  <main class="container">
-    {{ block "main" . }}{{ end }}
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <p>© {{ now.Format "2006" }} isdotdot · Why Things Happen</p>
-    </div>
-  </footer>
+<header>
+  <div style="max-width:800px;margin:0 auto;">
+    <a href="{{ .Site.BaseURL }}"><h1>{{ .Site.Title }}</h1></a>
+    <p>{{ .Site.Params.description }}</p>
+  </div>
+</header>
+<main>
+  {{ block "main" . }}{{ end }}
+</main>
+<footer>
+  &copy; {{ now.Year }} isdotdot · <a href="{{ .Site.BaseURL }}index.xml">RSS</a>
+</footer>
 </body>
 </html>

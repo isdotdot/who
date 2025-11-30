@@ -1,0 +1,14 @@
+{{ define "main" }}
+<h1>{{ .Site.Title }}</h1>
+<p>{{ .Site.Params.description }}</p>
+
+<h2>Latest articles</h2>
+<ul>
+  {{ range first 20 (where .Site.RegularPages "Section" "posts") }}
+    <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a><br>
+      <span style="color:#6b7280">{{ .Date.Format "Jan 2, 2006" }}</span>
+    </li>
+  {{ end }}
+</ul>
+{{ end }}

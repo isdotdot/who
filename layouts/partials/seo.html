@@ -1,0 +1,32 @@
+{{- $title := .Title -}}
+{{- $siteTitle := .Site.Title -}}
+{{- $fullTitle := printf "%s · %s" $title $siteTitle -}}
+{{- $desc := cond (ne .Description "") .Description .Site.Params.description -}}
+{{- $url := .Permalink -}}
+{{- $image := .Site.Params.defaultSocialImage -}}
+
+<link rel="canonical" href="{{ $url }}"/>
+<meta name="description" content="{{ $desc }}"/>
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ $fullTitle }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:url" content="{{ $url }}">
+{{ with $image }}<meta property="og:image" content="{{ . }}">{{ end }}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $fullTitle }}">
+<meta name="twitter:description" content="{{ $desc }}">
+
+{{ if .IsPage }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "{{ $title }}",
+  "description": "{{ $desc }}",
+  "url": "{{ $url }}",
+  "mainEntityOfPage": "{{ $url }}"
+}
+</script>
+{{ end }}

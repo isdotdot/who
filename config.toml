@@ -1,7 +1,28 @@
+
+
+
+
 baseURL = "https://who.isdotdot.com/"
 languageCode = "en-us"
 title = "Who People Are"
 paginate = 10
+enableRobotsTXT = true
 
 [params]
-  siteDescription = "Short profiles and quick histories answering 'Who is...?' questions."
+  description = "Short profiles and quick histories answering 'Who is...?' questions."
+  twitterHandle = "@your_twitter_here" # optional
+  defaultSocialImage = "https://isdotdot.com/images/social-default.png" # optional
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  page = ["HTML"]
+
+[related]
+  includeNewer = true
+  threshold = 80
+  toLower = true
+
+  [[related.indices]]
+    name = "tags"
+    weight = 100
